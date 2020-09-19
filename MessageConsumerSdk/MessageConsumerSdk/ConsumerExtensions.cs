@@ -11,10 +11,10 @@ namespace MessageConsumerSdk
 {
     public static class ConsumerExtensions
     {
-        public static IServiceCollection AddMessageBrokerConsumer(
+        public static IServiceCollection AddConsumer(
             this IServiceCollection services,
             IConfiguration configuration,
-            Action<IConsumerRegistration> consumers,
+            Action<IConsumerRegistration> consumers = null,
             Action<IDestinationQueueMapper> queues = null)
         {
             services.Configure<ConsumerOptions>(configuration.GetSection(nameof(ConsumerOptions)));
@@ -54,7 +54,7 @@ namespace MessageConsumerSdk
                 var provider = services.BuildServiceProvider();
 
                 var cr = provider.GetService<IConsumerRegistration>();
-                consumers.Invoke(cr);
+                consumers?.Invoke(cr);
 
                 var qm = provider.GetService<IDestinationQueueMapper>();
                 queues?.Invoke(qm);
