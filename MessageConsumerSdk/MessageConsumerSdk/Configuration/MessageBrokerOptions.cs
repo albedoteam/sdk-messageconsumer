@@ -3,9 +3,9 @@ using MessageConsumerSdk.Configuration.Abstractions;
 
 namespace MessageConsumerSdk.Configuration
 {
-    public class ConsumerOptions : IConsumerOptions
+    public class MessageBrokerOptions : IMessageBrokerOptions
     {
-        public string BrokerHost { get; set; }
+        public string Host { get; set; }
         public Dictionary<string, string> DestinationQueues { get; set; }
     }
 }

@@ -6,9 +6,9 @@ namespace MessageConsumerSdk.Configuration
 {
     public class DestinationQueueMapper : IDestinationQueueMapper
     {
-        private readonly IConsumerOptions _options;
+        private readonly IMessageBrokerOptions _options;
 
-        public DestinationQueueMapper(IConsumerOptions options)
+        public DestinationQueueMapper(IMessageBrokerOptions options)
         {
             _options = options;
         }
