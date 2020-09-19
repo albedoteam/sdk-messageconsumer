@@ -6,6 +6,6 @@ namespace MessageConsumerSdk.Configuration
 {
     public interface IConsumerRegistration
     {
-        void Add<T>(Action<IRetryConfigurator> configureRetries = null) where T : class, IConsumer;      
+        void Add<T>(Action<IRetryConfigurator> configureRetries = null) where T : class, IConsumer;
     }
 }

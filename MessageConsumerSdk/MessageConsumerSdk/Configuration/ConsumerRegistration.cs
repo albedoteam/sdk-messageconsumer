@@ -5,7 +5,7 @@ using MassTransit.ExtensionsDependencyInjectionIntegration;
 
 namespace MessageConsumerSdk.Configuration
 {
-    public class ConsumerRegistration: IConsumerRegistration
+    public class ConsumerRegistration : IConsumerRegistration
     {
         private readonly IServiceCollectionBusConfigurator _busConfigurator;
 
@@ -17,20 +17,13 @@ namespace MessageConsumerSdk.Configuration
         public void Add<T>(Action<IRetryConfigurator> configureRetries = null) where T : class, IConsumer
         {
             if (configureRetries != null)
-            {
                 _busConfigurator.AddConsumer<T>(c =>
                 {
                     c.UseInMemoryOutbox();
                     c.UseMessageRetry(configureRetries.Invoke);
                 });
-            }
             else
-            {
-                _busConfigurator.AddConsumer<T>(c =>
-                {
-                    c.UseInMemoryOutbox();
-                });
-            }
+                _busConfigurator.AddConsumer<T>(c => { c.UseInMemoryOutbox(); });
         }
     }
 }
