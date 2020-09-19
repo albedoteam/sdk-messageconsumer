@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MassTransit;
+using MessageConsumerSdk.Configuration.Abstractions;
 using Microsoft.Extensions.Logging;
 
 namespace MessageConsumerSdk.Configuration

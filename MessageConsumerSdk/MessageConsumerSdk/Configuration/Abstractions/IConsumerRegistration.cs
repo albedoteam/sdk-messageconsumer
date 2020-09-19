@@ -2,7 +2,7 @@ using System;
 using GreenPipes.Configurators;
 using MassTransit;
 
-namespace MessageConsumerSdk.Configuration
+namespace MessageConsumerSdk.Configuration.Abstractions
 {
     public interface IConsumerRegistration
     {

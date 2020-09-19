@@ -1,4 +1,4 @@
-namespace MessageConsumerSdk.Configuration
+namespace MessageConsumerSdk.Configuration.Abstractions
 {
     public interface IDestinationQueueMapper
     {

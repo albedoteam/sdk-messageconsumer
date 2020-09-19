@@ -1,13 +1,14 @@
 using System;
 using MassTransit;
+using MessageConsumerSdk.Configuration.Abstractions;
 
 namespace MessageConsumerSdk.Configuration
 {
     public class DestinationQueueMapper : IDestinationQueueMapper
     {
-        private readonly IBroker _options;
+        private readonly IConsumerOptions _options;
 
-        public DestinationQueueMapper(IBroker options)
+        public DestinationQueueMapper(IConsumerOptions options)
         {
             _options = options;
         }

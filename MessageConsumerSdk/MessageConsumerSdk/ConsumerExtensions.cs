@@ -1,26 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using GreenPipes;
 using MassTransit;
 using MessageConsumerSdk.Configuration;
+using MessageConsumerSdk.Configuration.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace MessageConsumerSdk
 {
-    public interface IBroker
-    {
-        public string Host { get; set; }
-        public Dictionary<string, string> DestinationQueues { get; set; }
-    }
-
-    public class Broker : IBroker
-    {
-        public string Host { get; set; }
-        public Dictionary<string, string> DestinationQueues { get; set; }
-    }
-
     public static class ConsumerExtensions
     {
         public static IServiceCollection AddMessageBrokerConsumer(
@@ -29,17 +17,20 @@ namespace MessageConsumerSdk
             Action<IConsumerRegistration> consumers,
             Action<IDestinationQueueMapper> queues = null)
         {
+            services.Configure<ConsumerOptions>(configuration.GetSection(nameof(ConsumerOptions)));
+            services.AddSingleton<IConsumerOptions>(provider =>
+                provider.GetRequiredService<IOptions<ConsumerOptions>>().Value);
+
+            services.AddTransient<IBusRunner, BusRunner>();
+
             var sp = services.BuildServiceProvider();
-            var options = sp.GetService<IBroker>();
+            var options = sp.GetService<IConsumerOptions>();
 
             if (options == null)
                 throw new ArgumentNullException(nameof(options));
 
-            if (string.IsNullOrWhiteSpace(options.Host))
+            if (string.IsNullOrWhiteSpace(options.BrokerHost))
                 throw new InvalidOperationException("Can not start the service without a valid Message Broker Host");
-
-            services.AddSingleton<IBroker>(serviceProvider =>
-                serviceProvider.GetRequiredService<IOptions<Broker>>().Value);
 
             services.AddMassTransit(x =>
             {
@@ -52,7 +43,7 @@ namespace MessageConsumerSdk
                         r.Ignore<ArgumentNullException>();
                     });
 
-                    cfg.Host(options.Host);
+                    cfg.Host(options.BrokerHost);
                     cfg.ConfigureEndpoints(context);
                 });
 

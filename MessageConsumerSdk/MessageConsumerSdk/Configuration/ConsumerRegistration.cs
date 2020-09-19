@@ -2,6 +2,7 @@ using System;
 using GreenPipes.Configurators;
 using MassTransit;
 using MassTransit.ExtensionsDependencyInjectionIntegration;
+using MessageConsumerSdk.Configuration.Abstractions;
 
 namespace MessageConsumerSdk.Configuration
 {
