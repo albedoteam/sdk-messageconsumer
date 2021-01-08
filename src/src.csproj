@@ -2,6 +2,8 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
+        <RootNamespace>AlbedoTeam.Sdk.MessageConsumer</RootNamespace>
+        <AssemblyName>albedoteam-sdk-messageconsumer</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>

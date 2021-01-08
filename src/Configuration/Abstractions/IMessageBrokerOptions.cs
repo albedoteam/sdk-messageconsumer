@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace MessageConsumerSdk.Configuration.Abstractions
+namespace AlbedoTeam.Sdk.MessageConsumer.Configuration.Abstractions
 {
     public interface IMessageBrokerOptions
     {
