@@ -3,9 +3,7 @@ using AlbedoTeam.Sdk.MessageConsumer.Configuration;
 using AlbedoTeam.Sdk.MessageConsumer.Configuration.Abstractions;
 using GreenPipes;
 using MassTransit;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace AlbedoTeam.Sdk.MessageConsumer
 {
@@ -13,29 +11,29 @@ namespace AlbedoTeam.Sdk.MessageConsumer
     {
         public static IServiceCollection AddConsumer(
             this IServiceCollection services,
-            IConfiguration configuration,
+            Action<IMessageBrokerOptions> configureBroker,
             Action<IConsumerRegistration> consumers = null,
             Action<IDestinationQueueMapper> queues = null)
         {
-            services.Configure<MessageBrokerOptions>(configuration.GetSection(nameof(MessageBrokerOptions)));
-            services.AddSingleton<IMessageBrokerOptions>(provider =>
-                provider.GetRequiredService<IOptions<MessageBrokerOptions>>().Value);
-
+            if (configureBroker == null)
+                throw new ArgumentNullException(nameof(configureBroker));
+            
+            IMessageBrokerOptions brokerOptions = new MessageBrokerOptions();
+            configureBroker.Invoke(brokerOptions);
+            
+            if (brokerOptions == null)
+                throw new NullReferenceException(nameof(brokerOptions));
+            
+            if (string.IsNullOrWhiteSpace(brokerOptions.Host))
+                throw new InvalidOperationException("Can not start the service without a valid Message Broker Host");
+            
+            services.AddSingleton(brokerOptions);
             services.AddTransient<IBusRunner, BusRunner>();
 
-            var sp = services.BuildServiceProvider();
-            var options = sp.GetService<IMessageBrokerOptions>();
-
-            if (options == null)
-                throw new ArgumentNullException(nameof(options));
-
-            if (string.IsNullOrWhiteSpace(options.Host))
-                throw new InvalidOperationException("Can not start the service without a valid Message Broker Host");
-
-            services.AddMassTransit(x =>
+            services.AddMassTransit(configure =>
             {
-                x.SetKebabCaseEndpointNameFormatter();
-                x.UsingRabbitMq((context, cfg) =>
+                configure.SetKebabCaseEndpointNameFormatter();
+                configure.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.UseMessageRetry(r =>
                     {
@@ -43,11 +41,11 @@ namespace AlbedoTeam.Sdk.MessageConsumer
                         r.Ignore<ArgumentNullException>();
                     });
 
-                    cfg.Host(options.Host);
+                    cfg.Host(brokerOptions.Host);
                     cfg.ConfigureEndpoints(context);
                 });
 
-                services.AddSingleton(x);
+                services.AddSingleton(configure);
                 services.AddScoped<IConsumerRegistration, ConsumerRegistration>();
                 services.AddScoped<IDestinationQueueMapper, DestinationQueueMapper>();
 
