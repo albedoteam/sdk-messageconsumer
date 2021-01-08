@@ -3,9 +3,7 @@ using AlbedoTeam.Sdk.MessageConsumer.Configuration;
 using AlbedoTeam.Sdk.MessageConsumer.Configuration.Abstractions;
 using GreenPipes;
 using MassTransit;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace AlbedoTeam.Sdk.MessageConsumer
 {
