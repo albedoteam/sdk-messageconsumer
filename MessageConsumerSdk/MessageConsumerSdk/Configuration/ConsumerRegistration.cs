@@ -26,5 +26,10 @@ namespace MessageConsumerSdk.Configuration
             else
                 _busConfigurator.AddConsumer<T>(c => { c.UseInMemoryOutbox(); });
         }
+
+        public void AddRequestClient<T>() where T : class
+        {
+            _busConfigurator.AddRequestClient<T>();
+        }
     }
 }
