@@ -1,11 +1,11 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using AlbedoTeam.Sdk.MessageConsumer.Configuration.Abstractions;
 using MassTransit;
-using MessageConsumerSdk.Configuration.Abstractions;
 using Microsoft.Extensions.Logging;
 
-namespace MessageConsumerSdk.Configuration
+namespace AlbedoTeam.Sdk.MessageConsumer.Configuration
 {
     public class BusRunner : IBusRunner
     {

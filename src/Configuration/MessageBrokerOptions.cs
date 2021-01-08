@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using MessageConsumerSdk.Configuration.Abstractions;
+using AlbedoTeam.Sdk.MessageConsumer.Configuration.Abstractions;
 
-namespace MessageConsumerSdk.Configuration
+namespace AlbedoTeam.Sdk.MessageConsumer.Configuration
 {
     public class MessageBrokerOptions : IMessageBrokerOptions
     {

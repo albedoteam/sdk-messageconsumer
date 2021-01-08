@@ -1,13 +1,13 @@
 ﻿using System;
+using AlbedoTeam.Sdk.MessageConsumer.Configuration;
+using AlbedoTeam.Sdk.MessageConsumer.Configuration.Abstractions;
 using GreenPipes;
 using MassTransit;
-using MessageConsumerSdk.Configuration;
-using MessageConsumerSdk.Configuration.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace MessageConsumerSdk
+namespace AlbedoTeam.Sdk.MessageConsumer
 {
     public static class ConsumerExtensions
     {

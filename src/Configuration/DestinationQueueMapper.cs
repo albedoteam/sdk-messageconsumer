@@ -1,8 +1,8 @@
 using System;
+using AlbedoTeam.Sdk.MessageConsumer.Configuration.Abstractions;
 using MassTransit;
-using MessageConsumerSdk.Configuration.Abstractions;
 
-namespace MessageConsumerSdk.Configuration
+namespace AlbedoTeam.Sdk.MessageConsumer.Configuration
 {
     public class DestinationQueueMapper : IDestinationQueueMapper
     {

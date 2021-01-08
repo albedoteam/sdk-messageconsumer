@@ -1,10 +1,10 @@
 using System;
+using AlbedoTeam.Sdk.MessageConsumer.Configuration.Abstractions;
 using GreenPipes.Configurators;
 using MassTransit;
 using MassTransit.ExtensionsDependencyInjectionIntegration;
-using MessageConsumerSdk.Configuration.Abstractions;
 
-namespace MessageConsumerSdk.Configuration
+namespace AlbedoTeam.Sdk.MessageConsumer.Configuration
 {
     public class ConsumerRegistration : IConsumerRegistration
     {
