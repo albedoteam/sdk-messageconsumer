@@ -7,10 +7,16 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="AlbedoTeam.Sdk.DataLayerAccess" Version="1.0.0-CI-20210108-213354" />
+      <PackageReference Include="AutoMapper" Version="10.1.1" />
       <PackageReference Include="MassTransit" Version="7.0.4" />
       <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="7.0.4" />
       <PackageReference Include="MassTransit.RabbitMQ" Version="7.0.4" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.8" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="EventStore" />
     </ItemGroup>
 
 </Project>
