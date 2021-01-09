@@ -1,4 +1,6 @@
 ﻿using System;
+using AlbedoTeam.Sdk.DataLayerAccess;
+using AlbedoTeam.Sdk.DataLayerAccess.Abstractions;
 using AlbedoTeam.Sdk.MessageConsumer.Configuration;
 using AlbedoTeam.Sdk.MessageConsumer.Configuration.Abstractions;
 using AlbedoTeam.Sdk.MessageConsumer.EventStore.Db;
@@ -67,11 +69,15 @@ namespace AlbedoTeam.Sdk.MessageConsumer
 
             services.AddSingleton(brokerConfiguration.Options);
 
-            if (brokerConfiguration.EventStoreOptions != null)
+            if (brokerConfiguration.UseEventStore)
             {
                 services.AddScoped<IMessageAuditStore, MongoMessageAuditStore>();
                 services.AddScoped<IEventStoreRepository, EventStoreRepository>();
                 services.AddTransient<IMessageMapper, MessageMapper>();
+
+                var dbSettings = provider.GetService<IDbSettings>();
+                if (dbSettings == null)
+                    throw new InvalidOperationException("Please add Data Access Layer to start Event Store");
             }
 
             services.AddTransient<IBusRunner, BusRunner>();
@@ -93,7 +99,7 @@ namespace AlbedoTeam.Sdk.MessageConsumer
                     var prd = services.BuildServiceProvider();
                     var auditStore = prd.GetService<IMessageAuditStore>();
 
-                    if (brokerConfiguration.EventStoreOptions != null)
+                    if (brokerConfiguration.UseEventStore)
                         cfg.ConnectSendAuditObservers(auditStore);
                 });
 

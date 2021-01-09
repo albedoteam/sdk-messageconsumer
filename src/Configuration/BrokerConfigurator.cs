@@ -6,7 +6,7 @@ namespace AlbedoTeam.Sdk.MessageConsumer.Configuration
     internal class BrokerConfigurator : IBrokerConfigurator
     {
         public IMessageBrokerOptions Options { get; private set; }
-        public IEventStoreOptions EventStoreOptions { get; private set; }
+        public bool UseEventStore { get; private set; }
 
         public IBrokerConfigurator SetBrokerOptions(Action<IMessageBrokerOptions> configureBrokerOptions)
         {
@@ -21,20 +21,9 @@ namespace AlbedoTeam.Sdk.MessageConsumer.Configuration
             return this;
         }
 
-        public IBrokerConfigurator AddEventStore(Action<IEventStoreOptions> configureEventStore)
+        public IBrokerConfigurator AddEventStore()
         {
-            IEventStoreOptions eventStoreOptions = new EventStoreOptions();
-            configureEventStore.Invoke(eventStoreOptions);
-
-            if (string.IsNullOrWhiteSpace(eventStoreOptions.ConnectionString))
-                throw new InvalidOperationException(
-                    "Can not start the event store without a valid Database ConnectionString");
-
-            if (string.IsNullOrWhiteSpace(eventStoreOptions.DatabaseName))
-                throw new InvalidOperationException("Can not start the event store without a valid Database Name");
-
-            EventStoreOptions = eventStoreOptions;
-
+            UseEventStore = true;
             return this;
         }
     }
