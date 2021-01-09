@@ -1,8 +1,13 @@
 ﻿using System;
+using AlbedoTeam.Sdk.DataLayerAccess;
+using AlbedoTeam.Sdk.DataLayerAccess.Abstractions;
 using AlbedoTeam.Sdk.MessageConsumer.Configuration;
 using AlbedoTeam.Sdk.MessageConsumer.Configuration.Abstractions;
+using AlbedoTeam.Sdk.MessageConsumer.EventStore.Db;
+using AlbedoTeam.Sdk.MessageConsumer.EventStore.Mappers;
 using GreenPipes;
 using MassTransit;
+using MassTransit.Audit;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AlbedoTeam.Sdk.MessageConsumer
@@ -11,7 +16,7 @@ namespace AlbedoTeam.Sdk.MessageConsumer
     {
         public static IServiceCollection AddBroker(
             this IServiceCollection services,
-            Action<IMessageBrokerOptions> configureBroker,
+            Action<IBrokerConfigurator> configureBroker,
             Action<IConsumerRegistration> configureConsumers)
         {
             return services.AddBrokerHub(configureBroker, configureConsumers);
@@ -19,7 +24,7 @@ namespace AlbedoTeam.Sdk.MessageConsumer
 
         public static IServiceCollection AddBroker(
             this IServiceCollection services,
-            Action<IMessageBrokerOptions> configureBroker,
+            Action<IBrokerConfigurator> configureBroker,
             Action<IConsumerRegistration> configureConsumers,
             Action<IDestinationQueueMapper> configureDestinationQueues)
         {
@@ -28,7 +33,7 @@ namespace AlbedoTeam.Sdk.MessageConsumer
 
         public static IServiceCollection AddBroker(
             this IServiceCollection services,
-            Action<IMessageBrokerOptions> configureBroker,
+            Action<IBrokerConfigurator> configureBroker,
             Action<IRequestClientRegistration> configureRequestClients)
         {
             return services.AddBrokerHub(configureBroker, null, null, configureRequestClients);
@@ -36,7 +41,7 @@ namespace AlbedoTeam.Sdk.MessageConsumer
 
         public static IServiceCollection AddBroker(
             this IServiceCollection services,
-            Action<IMessageBrokerOptions> configureBroker,
+            Action<IBrokerConfigurator> configureBroker,
             Action<IConsumerRegistration> configureConsumers,
             Action<IDestinationQueueMapper> configureDestinationQueues,
             Action<IRequestClientRegistration> configureRequestClients)
@@ -47,7 +52,7 @@ namespace AlbedoTeam.Sdk.MessageConsumer
 
         private static IServiceCollection AddBrokerHub(
             this IServiceCollection services,
-            Action<IMessageBrokerOptions> configureBroker,
+            Action<IBrokerConfigurator> configureBroker,
             Action<IConsumerRegistration> configureConsumers = null,
             Action<IDestinationQueueMapper> configureDestinationQueues = null,
             Action<IRequestClientRegistration> configureRequestClients = null)
@@ -55,16 +60,26 @@ namespace AlbedoTeam.Sdk.MessageConsumer
             if (configureBroker == null)
                 throw new ArgumentNullException(nameof(configureBroker));
 
-            IMessageBrokerOptions brokerOptions = new MessageBrokerOptions();
-            configureBroker.Invoke(brokerOptions);
+            services.AddScoped<IBrokerConfigurator, BrokerConfigurator>();
 
-            if (brokerOptions == null)
-                throw new NullReferenceException(nameof(brokerOptions));
+            var provider = services.BuildServiceProvider();
 
-            if (string.IsNullOrWhiteSpace(brokerOptions.Host))
-                throw new InvalidOperationException("Can not start the service without a valid Message Broker Host");
+            var brokerConfiguration = provider.GetService<IBrokerConfigurator>();
+            configureBroker.Invoke(brokerConfiguration);
 
-            services.AddSingleton(brokerOptions);
+            services.AddSingleton(brokerConfiguration.Options);
+
+            if (brokerConfiguration.UseEventStore)
+            {
+                services.AddScoped<IMessageAuditStore, MongoMessageAuditStore>();
+                services.AddScoped<IEventStoreRepository, EventStoreRepository>();
+                services.AddTransient<IMessageMapper, MessageMapper>();
+
+                var dbSettings = provider.GetService<IDbSettings>();
+                if (dbSettings == null)
+                    throw new InvalidOperationException("Please add Data Access Layer to start Event Store");
+            }
+
             services.AddTransient<IBusRunner, BusRunner>();
 
             services.AddMassTransit(configure =>
@@ -78,8 +93,14 @@ namespace AlbedoTeam.Sdk.MessageConsumer
                         r.Ignore<ArgumentNullException>();
                     });
 
-                    cfg.Host(brokerOptions.Host);
+                    cfg.Host(brokerConfiguration.Options.Host);
                     cfg.ConfigureEndpoints(context);
+
+                    var prd = services.BuildServiceProvider();
+                    var auditStore = prd.GetService<IMessageAuditStore>();
+
+                    if (brokerConfiguration.UseEventStore)
+                        cfg.ConnectSendAuditObservers(auditStore);
                 });
 
                 services.AddSingleton(configure);
@@ -87,7 +108,7 @@ namespace AlbedoTeam.Sdk.MessageConsumer
                 services.AddScoped<IDestinationQueueMapper, DestinationQueueMapper>();
                 services.AddScoped<IRequestClientRegistration, RequestClientRegistration>();
 
-                var provider = services.BuildServiceProvider();
+                provider = services.BuildServiceProvider();
 
                 var consumerRegistration = provider.GetService<IConsumerRegistration>();
                 configureConsumers?.Invoke(consumerRegistration);
