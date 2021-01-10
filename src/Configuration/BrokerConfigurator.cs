@@ -21,7 +21,7 @@ namespace AlbedoTeam.Sdk.MessageConsumer.Configuration
             return this;
         }
 
-        public IBrokerConfigurator AddEventStore()
+        public IBrokerConfigurator WithEventStore()
         {
             UseEventStore = true;
             return this;

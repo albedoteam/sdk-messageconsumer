@@ -8,6 +8,6 @@ namespace AlbedoTeam.Sdk.MessageConsumer.Configuration.Abstractions
         bool UseEventStore { get; }
 
         IBrokerConfigurator SetBrokerOptions(Action<IMessageBrokerOptions> configureBrokerOptions);
-        IBrokerConfigurator AddEventStore();
+        IBrokerConfigurator WithEventStore();
     }
 }

@@ -2,6 +2,6 @@
 {
     public interface IRequestClientRegistration
     {
-        void AddRequestClient<T>() where T : class;
+        IRequestClientRegistration Add<T>() where T : class;
     }
 }

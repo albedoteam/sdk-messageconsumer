@@ -1,10 +1,12 @@
 ﻿using System;
-using AlbedoTeam.Sdk.DataLayerAccess;
 using AlbedoTeam.Sdk.DataLayerAccess.Abstractions;
 using AlbedoTeam.Sdk.MessageConsumer.Configuration;
 using AlbedoTeam.Sdk.MessageConsumer.Configuration.Abstractions;
+using AlbedoTeam.Sdk.MessageConsumer.EventStore.Consumers;
+using AlbedoTeam.Sdk.MessageConsumer.EventStore.Contracts.Requests;
 using AlbedoTeam.Sdk.MessageConsumer.EventStore.Db;
 using AlbedoTeam.Sdk.MessageConsumer.EventStore.Mappers;
+using AlbedoTeam.Sdk.MessageConsumer.EventStore.Services;
 using GreenPipes;
 using MassTransit;
 using MassTransit.Audit;
@@ -73,7 +75,8 @@ namespace AlbedoTeam.Sdk.MessageConsumer
             {
                 services.AddScoped<IMessageAuditStore, MongoMessageAuditStore>();
                 services.AddScoped<IEventStoreRepository, EventStoreRepository>();
-                services.AddTransient<IMessageMapper, MessageMapper>();
+                services.AddScoped<IMessageMapper, MessageMapper>();
+                services.AddScoped<IEventStoreService, EventStoreService>();
 
                 var dbSettings = provider.GetService<IDbSettings>();
                 if (dbSettings == null)
@@ -113,11 +116,17 @@ namespace AlbedoTeam.Sdk.MessageConsumer
                 var consumerRegistration = provider.GetService<IConsumerRegistration>();
                 configureConsumers?.Invoke(consumerRegistration);
 
+                if (brokerConfiguration.UseEventStore)
+                    consumerRegistration.Add<EventRedeliveryRequestConsumer>();
+
                 var destinationQueueMapper = provider.GetService<IDestinationQueueMapper>();
                 configureDestinationQueues?.Invoke(destinationQueueMapper);
 
                 var requestClientRegistration = provider.GetService<IRequestClientRegistration>();
                 configureRequestClients?.Invoke(requestClientRegistration);
+
+                // if (brokerConfiguration.UseEventStore)
+                requestClientRegistration.Add<EventRedeliveryRequest>();
             });
 
             return services;
