@@ -20,11 +20,13 @@ namespace AlbedoTeam.Sdk.MessageConsumer.Configuration
         public async Task StoreMessage<T>(T message, MessageAuditMetadata metadata) where T : class
         {
             if (metadata.ContextType == "Publish")
+            {
                 await _eventStore.InsertOne(new EventOcurred
                 {
                     Message = message,
                     Metadata = _mapper.MapMessageAuditMetadataToModel(metadata)
                 });
+            }
 
             await Task.CompletedTask;
         }

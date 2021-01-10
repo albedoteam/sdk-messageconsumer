@@ -15,7 +15,7 @@ namespace AlbedoTeam.Sdk.MessageConsumer.Configuration
             _busConfigurator = busConfigurator;
         }
 
-        public void Add<T>(Action<IRetryConfigurator> configureRetries = null) where T : class, IConsumer
+        public IConsumerRegistration Add<T>(Action<IRetryConfigurator> configureRetries = null) where T : class, IConsumer
         {
             if (configureRetries != null)
                 _busConfigurator.AddConsumer<T>(c =>
@@ -25,6 +25,8 @@ namespace AlbedoTeam.Sdk.MessageConsumer.Configuration
                 });
             else
                 _busConfigurator.AddConsumer<T>(c => { c.UseInMemoryOutbox(); });
+
+            return this;
         }
     }
 }

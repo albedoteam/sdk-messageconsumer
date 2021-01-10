@@ -12,9 +12,10 @@ namespace AlbedoTeam.Sdk.MessageConsumer.Configuration
             _busConfigurator = busConfigurator;
         }
 
-        public void AddRequestClient<T>() where T : class
+        public IRequestClientRegistration Add<T>() where T : class
         {
             _busConfigurator.AddRequestClient<T>();
+            return this;
         }
     }
 }
