@@ -9,9 +9,5 @@ namespace AlbedoTeam.Sdk.MessageConsumer.EventStore.Db
 {
     public interface IEventStoreRepository : IBaseRepository<EventOcurred>
     {
-        // Task<(int totalPages, IReadOnlyList<EventOcurred> readOnlyList)> QueryByPage(
-        //     int page,
-        //     int pageSize,
-        //     Expression<Func<EventOcurred, bool>> filterExpression);
     }
 }
