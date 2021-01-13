@@ -6,7 +6,6 @@ using AlbedoTeam.Sdk.MessageConsumer.EventStore.Consumers;
 using AlbedoTeam.Sdk.MessageConsumer.EventStore.Contracts.Requests;
 using AlbedoTeam.Sdk.MessageConsumer.EventStore.Db;
 using AlbedoTeam.Sdk.MessageConsumer.EventStore.Mappers;
-using AlbedoTeam.Sdk.MessageConsumer.EventStore.Services;
 using GreenPipes;
 using MassTransit;
 using MassTransit.Audit;
@@ -76,7 +75,6 @@ namespace AlbedoTeam.Sdk.MessageConsumer
                 services.AddScoped<IMessageAuditStore, MongoMessageAuditStore>();
                 services.AddScoped<IEventStoreRepository, EventStoreRepository>();
                 services.AddScoped<IMessageMapper, MessageMapper>();
-                services.AddScoped<IEventStoreService, EventStoreService>();
 
                 var dbSettings = provider.GetService<IDbSettings>();
                 if (dbSettings == null)

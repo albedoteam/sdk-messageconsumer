@@ -8,5 +8,6 @@ namespace AlbedoTeam.Sdk.MessageConsumer.EventStore.Contracts.Requests
         int PageSize { get; set; }
         DateTime Since { get; set; }
         DateTime? Until { get; set; }
+        string EventType { get; set; }
     }
 }

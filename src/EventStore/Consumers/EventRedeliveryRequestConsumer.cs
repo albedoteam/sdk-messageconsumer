@@ -23,14 +23,24 @@ namespace AlbedoTeam.Sdk.MessageConsumer.EventStore.Consumers
 
         public async Task Consume(ConsumeContext<EventRedeliveryRequest> context)
         {
-            Expression<Func<EventOcurred, bool>> filterDefinition = e => e.Metadata.SentTime >= context.Message.Since;
+            Expression<Func<EventOcurred, bool>> filterDefinition;
+
+            if (string.IsNullOrWhiteSpace(context.Message.EventType))
+            {
+                filterDefinition = e => e.Metadata.SentTime >= context.Message.Since;
+            }
+            else
+            {
+                filterDefinition = e => e.Metadata.SentTime >= context.Message.Since
+                                        && e.EventType.Equals(context.Message.EventType);
+            }
 
             var (totalPages, messages) = await _eventStore.QueryByPage(
                 context.Message.Page,
                 context.Message.PageSize,
                 filterDefinition,
                 e => e.Metadata.SentTime);
-            
+
             await context.RespondAsync<PagedRedeliveryReponse>(new
             {
                 TotalPages = totalPages,
