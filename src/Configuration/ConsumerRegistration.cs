@@ -27,7 +27,11 @@ namespace AlbedoTeam.Sdk.MessageConsumer.Configuration
                     c.UseMessageRetry(r =>
                     {
                         r.Intervals(3000, 15000, 30000);
-                        r.Ignore<ArgumentNullException>();
+                        r.Ignore(
+                            typeof(InvalidCastException),
+                            typeof(InvalidOperationException),
+                            typeof(ArgumentException),
+                            typeof(ArgumentNullException));
                     });
                 });
             }
