@@ -88,11 +88,11 @@ namespace AlbedoTeam.Sdk.MessageConsumer
                 configure.SetKebabCaseEndpointNameFormatter();
                 configure.UsingRabbitMq((context, cfg) =>
                 {
-                    cfg.UseMessageRetry(r =>
-                    {
-                        r.Intervals(3000, 15000, 30000);
-                        r.Ignore<ArgumentNullException>();
-                    });
+                    // cfg.UseMessageRetry(r =>
+                    // {
+                    //     r.Intervals(3000, 15000, 30000);
+                    //     r.Ignore<ArgumentNullException>();
+                    // });
 
                     cfg.Host(brokerConfiguration.Options.Host);
                     cfg.ConfigureEndpoints(context);
