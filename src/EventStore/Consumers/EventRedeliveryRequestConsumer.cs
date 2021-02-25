@@ -7,6 +7,7 @@ using AlbedoTeam.Sdk.MessageConsumer.EventStore.Db;
 using AlbedoTeam.Sdk.MessageConsumer.EventStore.Mappers;
 using AlbedoTeam.Sdk.MessageConsumer.EventStore.Models;
 using MassTransit;
+using MongoDB.Driver;
 
 namespace AlbedoTeam.Sdk.MessageConsumer.EventStore.Consumers
 {
@@ -23,23 +24,21 @@ namespace AlbedoTeam.Sdk.MessageConsumer.EventStore.Consumers
 
         public async Task Consume(ConsumeContext<EventRedeliveryRequest> context)
         {
-            Expression<Func<EventOcurred, bool>> filterDefinition;
+            var filterBy = Builders<EventOcurred>.Filter.And(
+                Builders<EventOcurred>.Filter.Gte(e => e.Metadata.SentTime, context.Message.Since));
 
-            if (string.IsNullOrWhiteSpace(context.Message.EventType))
+            if (!string.IsNullOrWhiteSpace(context.Message.EventType))
             {
-                filterDefinition = e => e.Metadata.SentTime >= context.Message.Since;
-            }
-            else
-            {
-                filterDefinition = e => e.Metadata.SentTime >= context.Message.Since
-                                        && e.EventType.Equals(context.Message.EventType);
+                filterBy &= Builders<EventOcurred>.Filter.Eq(e => e.EventType, context.Message.EventType);
             }
 
+            var orderBy = Builders<EventOcurred>.Sort.Ascending(e => e.Metadata.SentTime);
+                
             var (totalPages, messages) = await _eventStore.QueryByPage(
                 context.Message.Page,
                 context.Message.PageSize,
-                filterDefinition,
-                e => e.Metadata.SentTime);
+                filterBy,
+                orderBy);
 
             await context.RespondAsync<PagedRedeliveryReponse>(new
             {

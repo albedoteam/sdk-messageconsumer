@@ -13,17 +13,8 @@ namespace AlbedoTeam.Sdk.MessageConsumer.EventStore.Db
 {
     public class EventStoreRepository : BaseRepository<EventOcurred>, IEventStoreRepository
     {
-        private readonly IMongoCollection<EventOcurred> _collection;
-
         public EventStoreRepository(IDbContext<EventOcurred> context) : base(context)
         {
-            _collection = context.GetCollection();
-        }
-
-        public new async Task DeleteById(string id)
-        {
-            var objectId = new ObjectId(id);
-            await _collection.DeleteOneAsync(t => t.Id == objectId);
         }
     }
 }
