@@ -20,7 +20,6 @@ namespace AlbedoTeam.Sdk.MessageConsumer.Configuration
             where T : class, IConsumer
         {
             if (configureRetries is null)
-            {
                 _busConfigurator.AddConsumer<T>(c =>
                 {
                     c.UseInMemoryOutbox();
@@ -34,15 +33,12 @@ namespace AlbedoTeam.Sdk.MessageConsumer.Configuration
                             typeof(ArgumentNullException));
                     });
                 });
-            }
             else
-            {
                 _busConfigurator.AddConsumer<T>(c =>
                 {
                     c.UseInMemoryOutbox();
                     c.UseMessageRetry(configureRetries.Invoke);
                 });
-            }
 
             return this;
         }

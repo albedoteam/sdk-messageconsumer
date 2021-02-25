@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json;
 using AlbedoTeam.Sdk.DataLayerAccess.Abstractions;
 using AlbedoTeam.Sdk.DataLayerAccess.Attributes;
 using MongoDB.Bson;
@@ -49,7 +50,7 @@ namespace AlbedoTeam.Sdk.MessageConsumer.EventStore.Models
 
         public void Serialize(BsonSerializationContext context, BsonSerializationArgs args, object value)
         {
-            var json = (value == null) ? "{}" : System.Text.Json.JsonSerializer.Serialize(value).Trim();
+            var json = value == null ? "{}" : JsonSerializer.Serialize(value).Trim();
 
             if (StartsAndEnds(json, "[", "]"))
             {
@@ -62,12 +63,12 @@ namespace AlbedoTeam.Sdk.MessageConsumer.EventStore.Models
             BsonSerializer.Serialize(context.Writer, typeof(BsonDocument), document);
         }
 
+        public Type ValueType => typeof(object);
+
         private static bool StartsAndEnds(string value, string start, string end)
         {
             return value.StartsWith(start, StringComparison.InvariantCultureIgnoreCase) &&
                    value.EndsWith(end, StringComparison.InvariantCultureIgnoreCase);
         }
-
-        public Type ValueType => typeof(object);
     }
 }

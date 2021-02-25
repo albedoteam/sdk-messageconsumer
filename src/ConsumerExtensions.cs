@@ -6,7 +6,6 @@ using AlbedoTeam.Sdk.MessageConsumer.EventStore.Consumers;
 using AlbedoTeam.Sdk.MessageConsumer.EventStore.Contracts.Requests;
 using AlbedoTeam.Sdk.MessageConsumer.EventStore.Db;
 using AlbedoTeam.Sdk.MessageConsumer.EventStore.Mappers;
-using GreenPipes;
 using MassTransit;
 using MassTransit.Audit;
 using Microsoft.Extensions.DependencyInjection;

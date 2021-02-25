@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using AlbedoTeam.Sdk.EventStore.Contracts;
 using AlbedoTeam.Sdk.MessageConsumer.EventStore.Contracts.Requests;
 using AlbedoTeam.Sdk.MessageConsumer.EventStore.Db;
@@ -28,12 +26,10 @@ namespace AlbedoTeam.Sdk.MessageConsumer.EventStore.Consumers
                 Builders<EventOcurred>.Filter.Gte(e => e.Metadata.SentTime, context.Message.Since));
 
             if (!string.IsNullOrWhiteSpace(context.Message.EventType))
-            {
                 filterBy &= Builders<EventOcurred>.Filter.Eq(e => e.EventType, context.Message.EventType);
-            }
 
             var orderBy = Builders<EventOcurred>.Sort.Ascending(e => e.Metadata.SentTime);
-                
+
             var (totalPages, messages) = await _eventStore.QueryByPage(
                 context.Message.Page,
                 context.Message.PageSize,
