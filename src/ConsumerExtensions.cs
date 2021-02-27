@@ -1,13 +1,7 @@
 ﻿using System;
-using AlbedoTeam.Sdk.DataLayerAccess.Abstractions;
 using AlbedoTeam.Sdk.MessageConsumer.Configuration;
 using AlbedoTeam.Sdk.MessageConsumer.Configuration.Abstractions;
-using AlbedoTeam.Sdk.MessageConsumer.EventStore.Consumers;
-using AlbedoTeam.Sdk.MessageConsumer.EventStore.Contracts.Requests;
-using AlbedoTeam.Sdk.MessageConsumer.EventStore.Db;
-using AlbedoTeam.Sdk.MessageConsumer.EventStore.Mappers;
 using MassTransit;
-using MassTransit.Audit;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AlbedoTeam.Sdk.MessageConsumer
@@ -68,18 +62,6 @@ namespace AlbedoTeam.Sdk.MessageConsumer
             configureBroker.Invoke(brokerConfiguration);
 
             services.AddSingleton(brokerConfiguration.Options);
-
-            if (brokerConfiguration.UseEventStore)
-            {
-                services.AddScoped<IMessageAuditStore, MongoMessageAuditStore>();
-                services.AddScoped<IEventStoreRepository, EventStoreRepository>();
-                services.AddScoped<IMessageMapper, MessageMapper>();
-
-                var dbSettings = provider.GetService<IDbSettings>();
-                if (dbSettings == null)
-                    throw new InvalidOperationException("Please add Data Access Layer to start Event Store");
-            }
-
             services.AddTransient<IBusRunner, BusRunner>();
 
             services.AddMassTransit(configure =>
@@ -87,20 +69,8 @@ namespace AlbedoTeam.Sdk.MessageConsumer
                 configure.SetKebabCaseEndpointNameFormatter();
                 configure.UsingRabbitMq((context, cfg) =>
                 {
-                    // cfg.UseMessageRetry(r =>
-                    // {
-                    //     r.Intervals(3000, 15000, 30000);
-                    //     r.Ignore<ArgumentNullException>();
-                    // });
-
                     cfg.Host(brokerConfiguration.Options.Host);
                     cfg.ConfigureEndpoints(context);
-
-                    var prd = services.BuildServiceProvider();
-                    var auditStore = prd.GetService<IMessageAuditStore>();
-
-                    if (brokerConfiguration.UseEventStore)
-                        cfg.ConnectSendAuditObservers(auditStore);
                 });
 
                 services.AddSingleton(configure);
@@ -113,17 +83,11 @@ namespace AlbedoTeam.Sdk.MessageConsumer
                 var consumerRegistration = provider.GetService<IConsumerRegistration>();
                 configureConsumers?.Invoke(consumerRegistration);
 
-                if (brokerConfiguration.UseEventStore)
-                    consumerRegistration.Add<EventRedeliveryRequestConsumer>();
-
                 var destinationQueueMapper = provider.GetService<IDestinationQueueMapper>();
                 configureDestinationQueues?.Invoke(destinationQueueMapper);
 
                 var requestClientRegistration = provider.GetService<IRequestClientRegistration>();
                 configureRequestClients?.Invoke(requestClientRegistration);
-
-                // if (brokerConfiguration.UseEventStore)
-                requestClientRegistration.Add<EventRedeliveryRequest>();
             });
 
             return services;

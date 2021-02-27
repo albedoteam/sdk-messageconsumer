@@ -6,7 +6,6 @@ namespace AlbedoTeam.Sdk.MessageConsumer.Configuration
     internal class BrokerConfigurator : IBrokerConfigurator
     {
         public IMessageBrokerOptions Options { get; private set; }
-        public bool UseEventStore { get; private set; }
 
         public IBrokerConfigurator SetBrokerOptions(Action<IMessageBrokerOptions> configureBrokerOptions)
         {
@@ -18,12 +17,6 @@ namespace AlbedoTeam.Sdk.MessageConsumer.Configuration
 
             Options = brokerOptions;
 
-            return this;
-        }
-
-        public IBrokerConfigurator WithEventStore()
-        {
-            UseEventStore = true;
             return this;
         }
     }
