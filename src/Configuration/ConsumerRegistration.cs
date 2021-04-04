@@ -1,12 +1,12 @@
-using System;
-using AlbedoTeam.Sdk.MessageConsumer.Configuration.Abstractions;
-using GreenPipes;
-using GreenPipes.Configurators;
-using MassTransit;
-using MassTransit.ExtensionsDependencyInjectionIntegration;
-
 namespace AlbedoTeam.Sdk.MessageConsumer.Configuration
 {
+    using System;
+    using Abstractions;
+    using GreenPipes;
+    using GreenPipes.Configurators;
+    using MassTransit;
+    using MassTransit.ExtensionsDependencyInjectionIntegration;
+
     public class ConsumerRegistration : IConsumerRegistration
     {
         private readonly IServiceCollectionBusConfigurator _busConfigurator;

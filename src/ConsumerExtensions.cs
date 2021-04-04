@@ -1,11 +1,11 @@
-﻿using System;
-using AlbedoTeam.Sdk.MessageConsumer.Configuration;
-using AlbedoTeam.Sdk.MessageConsumer.Configuration.Abstractions;
-using MassTransit;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace AlbedoTeam.Sdk.MessageConsumer
+﻿namespace AlbedoTeam.Sdk.MessageConsumer
 {
+    using System;
+    using Configuration;
+    using Configuration.Abstractions;
+    using MassTransit;
+    using Microsoft.Extensions.DependencyInjection;
+
     public static class ConsumerExtensions
     {
         public static IServiceCollection AddBroker(
@@ -58,10 +58,11 @@ namespace AlbedoTeam.Sdk.MessageConsumer
 
             var provider = services.BuildServiceProvider();
 
-            var brokerConfiguration = provider.GetService<IBrokerConfigurator>();
-            configureBroker.Invoke(brokerConfiguration);
+            var broker = provider.GetService<IBrokerConfigurator>();
+            configureBroker.Invoke(broker);
 
-            services.AddSingleton(brokerConfiguration.Options);
+            var options = broker.Options;
+            services.AddSingleton(options);
             services.AddTransient<IBusRunner, BusRunner>();
 
             services.AddMassTransit(configure =>
@@ -69,8 +70,19 @@ namespace AlbedoTeam.Sdk.MessageConsumer
                 configure.SetKebabCaseEndpointNameFormatter();
                 configure.UsingRabbitMq((context, cfg) =>
                 {
-                    cfg.Host(brokerConfiguration.Options.Host);
+                    cfg.Host(options.HostOptions.Host, h =>
+                    {
+                        h.Heartbeat(options.HostOptions.HeartbeatInterval);
+                        h.RequestedChannelMax(options.HostOptions.RequestedChannelMax);
+                        h.RequestedConnectionTimeout(options.HostOptions.RequestedConnectionTimeout);
+                    });
                     cfg.ConfigureEndpoints(context);
+                    cfg.PrefetchCount = options.PrefetchCount;
+
+                    cfg.UseKillSwitch(switchOptions => switchOptions
+                        .SetActivationThreshold(options.KillSwitchOptions.ActivationThreshold)
+                        .SetTripThreshold(options.KillSwitchOptions.TripThreshold)
+                        .SetRestartTimeout(s: options.KillSwitchOptions.RestartTimeout));
                 });
 
                 services.AddSingleton(configure);

@@ -1,8 +1,8 @@
-﻿using System;
-using AlbedoTeam.Sdk.MessageConsumer.Configuration.Abstractions;
-
-namespace AlbedoTeam.Sdk.MessageConsumer.Configuration
+﻿namespace AlbedoTeam.Sdk.MessageConsumer.Configuration
 {
+    using System;
+    using Abstractions;
+
     internal class BrokerConfigurator : IBrokerConfigurator
     {
         public IMessageBrokerOptions Options { get; private set; }
@@ -12,7 +12,7 @@ namespace AlbedoTeam.Sdk.MessageConsumer.Configuration
             IMessageBrokerOptions brokerOptions = new MessageBrokerOptions();
             configureBrokerOptions.Invoke(brokerOptions);
 
-            if (string.IsNullOrWhiteSpace(brokerOptions.Host))
+            if (string.IsNullOrWhiteSpace(brokerOptions.HostOptions.Host))
                 throw new InvalidOperationException("Can not start the service without a valid Message Broker Host");
 
             Options = brokerOptions;

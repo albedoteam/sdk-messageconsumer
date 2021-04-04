@@ -1,8 +1,8 @@
-﻿using AlbedoTeam.Sdk.MessageConsumer.Configuration.Abstractions;
-using MassTransit.ExtensionsDependencyInjectionIntegration;
-
-namespace AlbedoTeam.Sdk.MessageConsumer.Configuration
+﻿namespace AlbedoTeam.Sdk.MessageConsumer.Configuration
 {
+    using Abstractions;
+    using MassTransit.ExtensionsDependencyInjectionIntegration;
+
     public class RequestClientRegistration : IRequestClientRegistration
     {
         private readonly IServiceCollectionBusConfigurator _busConfigurator;

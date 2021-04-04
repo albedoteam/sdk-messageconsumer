@@ -1,10 +1,10 @@
-using System;
-using AlbedoTeam.Sdk.MessageConsumer.Configuration.Abstractions;
-using MassTransit;
-using MassTransit.Definition;
-
 namespace AlbedoTeam.Sdk.MessageConsumer.Configuration
 {
+    using System;
+    using Abstractions;
+    using MassTransit;
+    using MassTransit.Definition;
+
     public class DestinationQueueMapper : IDestinationQueueMapper
     {
         public IDestinationQueueMapper Map<T>() where T : class

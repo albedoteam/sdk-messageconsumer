@@ -1,8 +1,8 @@
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace AlbedoTeam.Sdk.MessageConsumer.Configuration.Abstractions
 {
+    using System.Threading;
+    using System.Threading.Tasks;
+
     public interface IBusRunner
     {
         string Who { get; }

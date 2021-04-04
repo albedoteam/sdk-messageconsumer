@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace AlbedoTeam.Sdk.MessageConsumer.Configuration.Abstractions
+﻿namespace AlbedoTeam.Sdk.MessageConsumer.Configuration.Abstractions
 {
+    using System;
+
     public interface IBrokerConfigurator
     {
         IMessageBrokerOptions Options { get; }
